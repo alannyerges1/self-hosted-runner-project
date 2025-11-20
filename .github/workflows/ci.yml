@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Full CI Pipeline (Node + Docker)
 
 on:
   push:
@@ -7,31 +7,43 @@ on:
     branches: ["main"]
 
 jobs:
-  build-and-test:
+  build-test-docker:
     runs-on: self-hosted
 
     steps:
+      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Set up Node for normal npm tests
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      # Install dependencies for regular tests
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
+      # Run Jest tests on the host (quick feedback)
+      - name: Run Jest tests
         run: npm test
 
-      - name: Build project
-        run: |
-          mkdir build
-          echo "Build output for CI demo" > build/output.txt
+      # 🔥 Build Docker image
+      - name: Build Docker image
+        run: docker build -t local-ci-app:ci .
 
-      - name: Upload build artifact
+      # 🧪 Run tests inside Docker container
+      - name: Run tests inside Docker container
+        run: |
+          docker run --rm local-ci-app:ci npm test
+
+      # 📦 Save Docker image as artifact (optional but recommended)
+      - name: Save Docker image as tarball artifact
+        run: docker save local-ci-app:ci -o local-ci-app.tar
+
+      - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ci-demo-artifact
-          path: build/
+          name: docker-image
+          path: local-ci-app.tar
