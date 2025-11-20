@@ -64,7 +64,7 @@ jobs:
 
       - name: Stop existing container (if running)
         run: |
-          docker compose down || true
+          try { docker compose down } catch { Write-Host "No containers to stop" }
 
       - name: Start updated container
         run: docker compose up -d
