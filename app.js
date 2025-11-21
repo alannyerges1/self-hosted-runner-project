@@ -5,7 +5,7 @@ const app = express();
 app.get('/', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'Local GitHub Actions Runner Demo'
+    message: 'Hello from Local CI Runner Demo App!  Your app is running successfully. I appreciate you testing out the Local CI Runner project.',
   });
 });
 
